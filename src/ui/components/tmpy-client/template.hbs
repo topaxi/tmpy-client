@@ -1,3 +1,11 @@
-<div>
-  <h1>Welcome to Glimmer!</h1>
-</div>
+<header>
+  <h1>tmpy - Sharing temporary files</h1>
+  <p>Welcome to your friendly file sharing app</p>
+</header>
+<main>
+  <p>
+    <small>Files are deleted automatically 15 minutes after the upload</small>
+  </p>
+  <file-list @tmpyFiles={{tmpyFiles}} />
+  <file-upload @onUpload={{action onUpload}} />
+</main>

@@ -9,7 +9,7 @@ export default class App extends Application {
     let resolver = new Resolver(resolverConfiguration, moduleRegistry);
 
     super({
-      rootName: resolverConfiguration.app.rootName,
+      rootName: resolverConfiguration!.app.rootName,
       resolver
     });
   }

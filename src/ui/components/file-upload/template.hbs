@@ -1,0 +1,11 @@
+<label id="drop"
+    ondragover={{action dragOver}}
+    ondragenter={{action dragEnter}}
+    ondragleave={{action dragLeave}}
+    ondrop={{action drop}}>
+  <span class="drop-hint">Click or drop files here to upload!</span>
+  <input type="file" multiple
+      onchange={{action inputChange}}
+      ondrop={{action stopImmediatePropagation}}
+      ondragover={{action stopImmediatePropagation}} />
+</label>

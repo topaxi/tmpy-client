@@ -1,3 +1,133 @@
-h1 {
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #00b7ff;
+}
+
+html, body, #app, main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+html {
+  border: 10px dashed #efefef;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 25px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   color: #444;
+}
+
+main {
+  flex: 1;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+.copy {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+#drop {
+  flex: 1;
+  display: flex;
+  min-height: 128px;
+  justify-content: center;
+  align-items: center;
+  border: 3px dashed #d4d2d2;
+  position: relative;
+  cursor: pointer;
+  background-color: #efefef;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+#drop:hover {
+  background-color: #e6e6e6;
+  border: 3px dashed #b9b9b9;
+}
+
+#drop > input {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  width: 100%;
+  visibility: hidden;
+}
+
+.drag-over {
+  background: #efe;
+}
+
+#drop:hover .drop-hint {
+  background: #d4d2d2;
+  padding: 1rem;
+  border-radius: 2px;
+  color: #444;
+}
+span.drop-hint {
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+ul.file-list {
+  list-style-type: square;
+}
+
+@keyframes new-file {
+  from {
+    background-color: yellow;
+  }
+
+  to {
+    background-color: transparent;
+  }
+}
+
+.file-list > li {
+  padding: .2rem .5rem;
+  animation: new-file 1s;
+}
+
+.file-list progress {
+  margin-right: 0.5em;
+}
+
+progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  border: 0;
+
+  background-color: #eee;
+}
+progress::-moz-progress-bar {
+  background-color: var(--color-primary);
+  transition: background-color 100ms;
+}
+progress:indeterminate::-moz-progress-bar {
+  background-color: #dd9;
+}
+progress::-webkit-progress-value {
+  background-color: var(--color-primary);
+  transition: background-color 100ms;
+}
+progress::-webkit-progress-bar {
+  background-color: #eee;
+  transition: background-color 100ms;
+}
+progress:indeterminate::-webkit-progress-bar {
+  background-color: #dd9;
 }

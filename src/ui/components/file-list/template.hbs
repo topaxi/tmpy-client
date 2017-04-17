@@ -5,11 +5,10 @@
         <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
         <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
       {{else}}
-        {{tmpyFile.file.name}}
-
-        <progress max={{tmpyFile.total}} value={{tmpyFile.loaded}}>
-          {{tmpyFile.progress}}%
-        </progress>
+        <tmpy-progress @max={{tmpyFile.total}} @value={{tmpyFile.loaded}}>
+          {{tmpyFile.file.name}}
+          {{percent max=tmpyFile.total value=tmpyFile.loaded}}%
+        </tmpy-progress>
       {{/if}}
     </li>
   {{/each}}

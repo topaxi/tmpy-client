@@ -102,34 +102,35 @@ ul.file-list {
   animation: new-file 1s;
 }
 
-.file-list progress {
+.file-list .tmpy-progress {
   margin-right: 0.5em;
 }
 
-progress {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  border: 0;
-
+.tmpy-progress {
+  display: inline-block;
+  min-width: 200px;
+  max-height: 1rem;
+  position: relative;
   background-color: #eee;
+  text-align: center;
 }
-progress::-moz-progress-bar {
-  background-color: var(--color-primary);
-  transition: background-color 100ms, width 50ms;
-}
-progress:indeterminate::-moz-progress-bar {
+.tmpy-progress.indeterminate::before {
   background-color: #dd9;
 }
-progress::-webkit-progress-value {
+.tmpy-progress.completed::before {
+  background-color: #4e4;
+}
+.tmpy-progress::before {
+  transition: background-color 100ms, width 50ms;
+  z-index: 0;
+  content: '';
+  width: var(--percent, 0);
   background-color: var(--color-primary);
-  transition: background-color 100ms, width 50ms;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
 }
-progress::-webkit-progress-bar {
-  background-color: #eee;
-  transition: background-color 100ms, width 50ms;
-}
-progress:indeterminate::-webkit-progress-bar {
-  background-color: #dd9;
+.tmpy-progress > * {
+  position: relative;
 }

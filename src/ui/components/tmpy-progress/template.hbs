@@ -1,0 +1,4 @@
+<div class="tmpy-progress {{if completed 'completed'}} {{if indeterminate 'indeterminate'}}"
+    style="--percent:{{percent max=@max value=@value precision=3}}%">
+  <span>{{~yield~}}</span>
+</div>

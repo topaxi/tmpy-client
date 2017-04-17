@@ -14,6 +14,6 @@ app.registerInitializer({
   }
 });
 
-app.renderComponent('tmpy-client', containerElement, null);
+app.renderComponent('tmpy-client', containerElement!, null);
 
 app.boot();

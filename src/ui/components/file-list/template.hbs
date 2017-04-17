@@ -1,5 +1,16 @@
 <ul class="file-list">
   {{#each @tmpyFiles key="@index" as |tmpyFile|}}
-    <li>{{tmpyFile.file.name}}</li>
+    <li>
+      {{#if tmpyFile.completed}}
+        <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
+        <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
+      {{else}}
+        {{tmpyFile.file.name}}
+
+        <progress max={{tmpyFile.total}} value={{tmpyFile.loaded}}>
+          {{tmpyFile.progress}}%
+        </progress>
+      {{/if}}
+    </li>
   {{/each}}
 </ul>

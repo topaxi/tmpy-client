@@ -151,7 +151,18 @@ ul.file-list {
   list-style-type: square;
 }
 
-@keyframes new-file {
+@keyframes new-file-fadein {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes new-file-background {
   from {
     background-color: yellow;
   }
@@ -163,7 +174,7 @@ ul.file-list {
 
 .file-list > li {
   padding: .2rem .5rem;
-  animation: new-file 1s;
+  animation: new-file-background 1s, new-file-fadein 0.2s;
 }
 
 .file-list .tmpy-progress {

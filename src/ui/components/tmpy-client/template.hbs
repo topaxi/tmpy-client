@@ -18,6 +18,21 @@
   <p>
     <small>Files are deleted automatically 15 minutes after the upload</small>
   </p>
+  <!--
+    maybe a small toggle with "zip" on the right
+    on activate, slide in input with zip filename (default tmpy-archive.zip)
+    Change drop area to a "zip brown box" which opens on dragover or focus
+    -
+    Or the toggle button could be a triple document or "zip-box"
+    -
+    Or two different dropping areas
+    -
+    Also show zipping progress, probably need to refactor file-list wrap tmpy-file
+    and "zip progress object"
+  -->
+  <label>
+    <input type="checkbox" checked={{enableZip}} onchange={{action setEnableZip}}>.zip
+  </label>
   <file-list @tmpyFiles={{tmpyFiles}}></file-list>
-  <file-upload @onUpload={{action onUpload}}></file-upload>
+  <file-upload @onUpload={{action onUpload}} @zip={{enableZip}}></file-upload>
 </main>

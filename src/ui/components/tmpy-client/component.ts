@@ -8,6 +8,7 @@ export default class TmpyClient extends Component {
   @tracked tmpyFiles: TmpyFile[] = [];
   @tracked showScript: boolean = false;
   @tracked script: string;
+  @tracked enableZip: boolean = false;
 
   private janitor: number;
   private _script: Promise<string>;
@@ -17,6 +18,10 @@ export default class TmpyClient extends Component {
       ...this.tmpyFiles,
       ...tmpyFiles
     ];
+  }
+
+  setEnableZip(e: Event): void {
+    this.enableZip = (e.target as HTMLInputElement).checked;
   }
 
   toggleScript() {

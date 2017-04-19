@@ -1,0 +1,46 @@
+.toggle {
+  display: none;
+
+  + label {
+    font-size: 0.5rem;
+    vertical-align: middle;
+    outline: 0;
+    display: inline-block;
+    width: 4em;
+    height: 2em;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    background: #f0f0f0;
+    border-radius: 2em;
+    padding: 2px;
+    transition: all .4s ease;
+    &::before, &::after {
+      position: relative;
+      display: block;
+      content: '';
+      width: 50%;
+      height: 100%;
+    }
+    &::before {
+      display: none;
+    }
+    &::after {
+      left: 0;
+      border-radius: 50%;
+      background: #fff;
+      transition: all .2s ease;
+    }
+    &::selection {
+      background: none;
+    }
+  }
+
+  &:checked + label {
+    background: #9FD6AE;
+
+    &::after {
+      left: 50%;
+    }
+  }
+}

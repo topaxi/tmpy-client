@@ -30,9 +30,11 @@
     Also show zipping progress, probably need to refactor file-list wrap tmpy-file
     and "zip progress object"
   -->
-  <label>
-    <input type="checkbox" checked={{enableZip}} onchange={{action setEnableZip}}>.zip
-  </label>
   <file-list @tmpyFiles={{tmpyFiles}}></file-list>
+  <label class="zip-toggle">
+    <input id="enableZip" class="toggle" type="checkbox" checked={{enableZip}} onchange={{action setEnableZip}}>
+    <label for="enableZip"></label>
+    .zip
+  </label>
   <file-upload @onUpload={{action onUpload}} @zip={{enableZip}}></file-upload>
 </main>

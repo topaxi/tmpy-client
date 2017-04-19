@@ -1,4 +1,5 @@
 @import 'tooltipped';
+@import 'toggle';
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -37,6 +38,11 @@ a {
 #app > header {
   display: flex;
   justify-content: space-between;
+}
+
+.zip-toggle {
+  align-self: flex-end;
+  margin-bottom: 0.5rem;
 }
 
 .shell-script {

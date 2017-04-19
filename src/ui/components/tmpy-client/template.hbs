@@ -1,6 +1,18 @@
+{{#if showScript}}
+  <div class="shell-script-dialog" onclick={{action toggleScript}}>
+    <pre onclick={{action stopPropagation}}><code>{{script}}</code></pre>
+  </div>
+{{/if}}
 <header>
-  <h1>tmpy - Sharing temporary files</h1>
-  <p>Welcome to your friendly file sharing app</p>
+  <div>
+    <h1>tmpy - Sharing temporary files</h1>
+    <p>Welcome to your friendly file sharing app</p>
+  </div>
+  <div>
+    <button class="shell-script" onclick={{action toggleScript}}>
+      >_
+    </button>
+  </div>
 </header>
 <main>
   <p>

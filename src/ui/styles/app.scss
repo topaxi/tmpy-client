@@ -34,12 +34,76 @@ a {
   color: var(--color-primary);
 }
 
+#app > header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.shell-script {
+  cursor: pointer;
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  padding: 0;
+}
+
+.shell-script-dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+.shell-script-dialog > pre {
+  background: #fff;
+  border-radius: 4px;
+  border: 2px solid rgba(0,0,0,.5);
+  width: -moz-max-content;
+  width: max-content;
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  display: flex;
+}
+.shell-script-dialog > pre > code {
+  display: block;
+  padding: 1rem;
+  overflow: auto;
+  max-height: 100%;
+}
+.shell-script-dialog > pre::before {
+  content: 'tmpy.sh';
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #eee;
+  padding: 2px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .copy {
   cursor: pointer;
   margin-left: 0.5rem;
   border: none;
   background: transparent;
   padding: 0;
+  animation: fade-in 0.2s forwards;
 }
 
 #drop {

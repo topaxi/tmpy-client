@@ -1,4 +1,5 @@
 import { tracked } from '@glimmer/component';
+import TmpyFileProgress from './tmpy-file-progress';
 import blobToArrayBuffer from '../utils/blob-to-arraybuffer';
 
 let fileId = 0;
@@ -11,9 +12,9 @@ export type TransferableTmpyFile = {
 
 export default class TmpyFile {
   id: number = ++fileId;
+  progress: TmpyFileProgress = new TmpyFileProgress;
+  @tracked file: File | null = null;
   @tracked url: string | null = null;
-  @tracked total: number = 0;
-  @tracked loaded: number = 0;
   @tracked completed_at: number | null = null;
 
   @tracked('completed_at')
@@ -24,13 +25,7 @@ export default class TmpyFile {
     this.completed_at = v ? Date.now() : null;
   }
 
-  constructor(public file: File) {
-  }
-
-  toTransferable(): Promise<TransferableTmpyFile> {
-    return blobToArrayBuffer(this.file)
-      .then(buffer => {
-        return { id: this.id, name: this.file.name, buffer };
-      });
+  constructor(file: File | null = null) {
+    this.file = file;
   }
 }

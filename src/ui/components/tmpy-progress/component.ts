@@ -3,12 +3,13 @@ import Component, { tracked } from '@glimmer/component';
 export default class TmpyProgress extends Component {
   args: {
     max: number,
-    value: number
+    value: number,
+    percent: number
   }
 
   @tracked('args')
   get indeterminate(): boolean {
-    return !this.args.max;
+    return !this.args.percent && !this.args.max;
   }
 
   @tracked('args')

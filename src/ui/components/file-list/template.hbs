@@ -5,9 +5,14 @@
         <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
         <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
       {{else}}
-        <tmpy-progress @max={{tmpyFile.total}} @value={{tmpyFile.loaded}}>
-          {{tmpyFile.file.name}}
-          {{percent max=tmpyFile.total value=tmpyFile.loaded}}%
+        <tmpy-progress class={{if tmpyFile.progress.uploadStarted 'uploading' 'zipping'}}
+            @percent={{tmpyFile.progress.percent}}>
+          {{#if tmpyFile.file.name}}
+            {{tmpyFile.file.name}}
+          {{else}}
+            {{tmpyFile.progress.zipCurrentFile}}
+          {{/if}}
+          {{tmpyFile.progress.percent}}%
         </tmpy-progress>
       {{/if}}
     </li>

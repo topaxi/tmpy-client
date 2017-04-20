@@ -1,11 +1,27 @@
 import Component, { tracked } from "@glimmer/component";
+import { TMPY_CLIENT_ACTIONS } from '../../../utils/tmpy-client-actions';
 import TmpyFile from '../../../utils/tmpy-file';
-import Upload from '../../../utils/upload';
 import blobToArrayBuffer from '../../../utils/blob-to-arraybuffer';
 
 export interface FileUploadArgs {
-  onUpload: (files: TmpyFile[]) => void;
+  dispatchTmpyAction: (e: TMPY_CLIENT_ACTIONS) => void;
   zip: boolean;
+}
+
+interface ZipBuffer {
+  type: 'zipbuffer';
+  tmpyFileId: number;
+  buffer: ArrayBuffer;
+}
+interface ZipProgress {
+  type: 'zipprogress';
+  tmpyFileId: number;
+  currentFile: string | null;
+  percent: number;
+}
+
+interface ZipWorkerMessageEvent extends MessageEvent {
+  data: ZipBuffer | ZipProgress
 }
 
 const MAX_CONCURRENCY = 4;
@@ -64,68 +80,62 @@ export default class FileUpload extends Component {
           .then(buffer => ({ name: file.name, buffer }))
       )
 
+      let tmpyFile = new TmpyFile;
+      this.args.dispatchTmpyAction({
+        type: 'tmpy-file-upload-queue',
+        data: { tmpyFiles: [ tmpyFile ] }
+      });
+
       Promise.all(filesToZip)
         .then(filesToZip => {
-          this.zipWorker.postMessage(filesToZip, filesToZip.map(f => f.buffer))
+          this.args.dispatchTmpyAction({
+            type: 'tmpy-file-zip-start',
+            data: { tmpyFileId: tmpyFile.id }
+          });
+
+          this.zipWorker.postMessage({
+            tmpyFileId: tmpyFile.id,
+            filesToZip
+          }, filesToZip.map(f => f.buffer))
         })
     }
     else {
       let tmpyFiles = Array.from(files, file => new TmpyFile(file));
 
-      this.uploadFiles(tmpyFiles);
-      this.args.onUpload(tmpyFiles);
+      this.args.dispatchTmpyAction({
+        type: 'tmpy-file-upload-queue',
+        data: { tmpyFiles }
+      });
+      this.args.dispatchTmpyAction({
+        type: 'tmpy-file-upload-start',
+        data: { tmpyFileIds: tmpyFiles.map(f => f.id) }
+      });
     }
-  }
-
-  uploadFiles(tmpyFiles: TmpyFile[]): void {
-    tmpyFiles.forEach(tmpyFile =>
-      new Upload(tmpyFile.file, {
-        chunking: false,
-        processResponse: xhr => xhr.responseText,
-        progress(e) {
-          if (e.lengthComputable) {
-            tmpyFile.loaded = e.loaded;
-            tmpyFile.total = e.total;
-          }
-          else {
-            tmpyFile.loaded = 0;
-            tmpyFile.total = 0;
-          }
-        }
-      })
-        .send()
-        .then((url: string) =>
-          Object.assign(tmpyFile, { url, completed: true })
-        )
-    );
   }
 
   private startZipWorker(): void {
     this.zipWorker = new Worker('/assets/workers/zip-worker.js');
 
-    this.zipWorker.onmessage = (e: MessageEvent) => {
-      let file = new File([ e.data.buffer ], 'tmpy-archive.zip');
-      let tmpyFile = new TmpyFile(file);
-      this.args.onUpload([ tmpyFile ]);
-
-      new Upload(tmpyFile.file, {
-        chunking: false,
-        processResponse: xhr => xhr.responseText,
-        progress(e) {
-          if (e.lengthComputable) {
-            tmpyFile.loaded = e.loaded;
-            tmpyFile.total = e.total;
+    this.zipWorker.onmessage = (e: ZipWorkerMessageEvent) => {
+      if (e.data.type === 'zipbuffer') {
+        return this.args.dispatchTmpyAction({
+          type: 'tmpy-file-zip-complete',
+          data: {
+            tmpyFileId: e.data.tmpyFileId,
+            buffer: e.data.buffer
           }
-          else {
-            tmpyFile.loaded = 0;
-            tmpyFile.total = 0;
+        });
+      }
+      else if (e.data.type === 'zipprogress') {
+        return this.args.dispatchTmpyAction({
+          type: 'tmpy-file-zip-progress',
+          data: {
+            tmpyFileId: e.data.tmpyFileId,
+            percent: e.data.percent,
+            currentFile: e.data.currentFile
           }
-        }
-      })
-        .send()
-        .then((url: string) =>
-          Object.assign(tmpyFile, { url, completed: true })
-        )
+        });
+      }
     }
   }
 }

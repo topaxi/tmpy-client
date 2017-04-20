@@ -36,5 +36,7 @@
     <label for="enableZip"></label>
     .zip
   </label>
-  <file-upload @onUpload={{action onUpload}} @zip={{enableZip}}></file-upload>
+  <file-upload
+      @dispatchTmpyAction={{action dispatch}}
+      @zip={{enableZip}}></file-upload>
 </main>

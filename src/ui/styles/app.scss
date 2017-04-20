@@ -199,6 +199,9 @@ ul.file-list {
 .tmpy-progress.indeterminate::before {
   background-color: #dd9;
 }
+.tmpy-progress.zipping::before {
+  background-color: #ee0;
+}
 .tmpy-progress.completed::before {
   background-color: #4e4;
 }

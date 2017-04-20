@@ -52,21 +52,23 @@ export default class TmpyClient extends Component {
 
   dispatch(a: TMPY_CLIENT_ACTIONS): void {
     switch (a.type) {
-      case 'tmpy-file-upload-queue':
+      case 'tmpy-file-upload-queue': {
         this.tmpyFiles = [
           ...this.tmpyFiles,
           ...a.data.tmpyFiles
         ];
         break;
-      case 'tmpy-file-zip-start':
+      }
+      case 'tmpy-file-zip-start': {
         // Nothing to do here
         break;
+      }
       case 'tmpy-file-zip-progress': {
         let tmpyFile = this.tmpyFiles.find(tmpyFile =>
           tmpyFile.id === a.data.tmpyFileId
         );
 
-        if (tmpyFile) {
+        if (tmpyFile !== undefined) {
           tmpyFile.progress.zipProgress = Math.round(a.data.percent);
           tmpyFile.progress.zipCurrentFile = a.data.currentFile;
         }
@@ -77,7 +79,7 @@ export default class TmpyClient extends Component {
           tmpyFile.id === a.data.tmpyFileId
         );
 
-        if (tmpyFile) {
+        if (tmpyFile !== undefined) {
           tmpyFile.file = new File([ a.data.buffer ], 'tmpy-archive.zip');
           tmpyFile.progress.zipComplete = true;
           this.dispatch({
@@ -87,18 +89,35 @@ export default class TmpyClient extends Component {
         }
         break;
       }
-      case 'tmpy-file-upload-start':
+      case 'tmpy-file-upload-start': {
         this.uploadFiles(
           this.tmpyFiles
             .filter(f => a.data.tmpyFileIds.indexOf(f.id) > -1)
         );
         break;
-      case 'tmpy-file-upload-progress':
-        // Update upload progress
+      }
+      case 'tmpy-file-upload-progress': {
+        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
+          tmpyFile.id === a.data.tmpyFileId
+        );
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.progress.uploadLoaded = a.data.loaded;
+          tmpyFile.progress.uploadTotal = a.data.total;
+        }
         break;
-      case 'tmpy-file-upload-complete':
-        // Set url={{url}} and completed=true
+      }
+      case 'tmpy-file-upload-complete': {
+        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
+          tmpyFile.id === a.data.tmpyFileId
+        );
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.url = a.data.url;
+          tmpyFile.completed = true;
+        }
         break;
+      }
     }
   }
 
@@ -118,20 +137,27 @@ export default class TmpyClient extends Component {
     new Upload(tmpyFile.file, {
       chunking: false,
       processResponse: xhr => xhr.responseText,
-      progress(e) {
+      progress: e => {
+        let loaded = 0;
+        let total = 0;
+
         if (e.lengthComputable) {
-          tmpyFile.progress.uploadLoaded = e.loaded;
-          tmpyFile.progress.uploadTotal = e.total;
+          loaded = e.loaded;
+          total = e.total;
         }
-        else {
-          tmpyFile.progress.uploadLoaded = 0;
-          tmpyFile.progress.uploadTotal = 0;
-        }
+
+        this.dispatch({
+          type: 'tmpy-file-upload-progress',
+          data: { tmpyFileId: tmpyFile.id, loaded, total }
+        });
       }
     })
     .send()
     .then((url: string) =>
-      Object.assign(tmpyFile, { url, completed: true })
+      this.dispatch({
+        type: 'tmpy-file-upload-complete',
+        data: { tmpyFileId: tmpyFile.id, url }
+      })
     )
   }
 }

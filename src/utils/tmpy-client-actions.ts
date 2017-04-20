@@ -47,7 +47,10 @@ export interface TmpyFileUploadProgressAction {
 
 export interface TmpyFileUploadCompleteAction {
   readonly type: 'tmpy-file-upload-complete';
-  readonly data: { readonly tmpyFile: TmpyFile };
+  readonly data: {
+    tmpyFileId: number,
+    url: string
+  };
 }
 
 export type TMPY_CLIENT_ACTIONS =

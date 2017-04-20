@@ -2,18 +2,24 @@ self.importScripts('/assets/jszip.min.js');
 
 self.onmessage = function(e/*: MessageEvent*/) {
   var zip = new JSZip;
+  var lastPercent = 0;
 
   for (var i = 0; i < e.data.filesToZip.length; i++) {
     zip.file(e.data.filesToZip[i].name, e.data.filesToZip[i].buffer)
   }
 
   zip.generateAsync({ type: 'arraybuffer' }, ({ currentFile, percent }) => {
-    self.postMessage({
-      type: 'zipprogress',
-      tmpyFileId: e.data.tmpyFileId,
-      currentFile: currentFile,
-      percent: percent
-    });
+    var flooredPercent = Math.floor(percent);
+
+    if (lastPercent !== flooredPercent) {
+      self.postMessage({
+        type: 'zipprogress',
+        tmpyFileId: e.data.tmpyFileId,
+        currentFile: currentFile,
+        percent: percent
+      });
+    }
+    lastPercent = flooredPercent;
   })
     .then(function(buffer) {
       self.postMessage({

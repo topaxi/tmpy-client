@@ -18,7 +18,7 @@
     "@glimmer/component": "^0.3.8",
     "@glimmer/resolver": "^0.3.0",
     "broccoli-asset-rev": "^2.5.0",
-    "broccoli-funnel": "^1.1.0",
+    "broccoli-funnel": "^1.2.0",
     "broccoli-merge-trees": "^2.0.0",
     "ember-cli": "github:ember-cli/ember-cli",
     "ember-cli-inject-live-reload": "^1.6.1",

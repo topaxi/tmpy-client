@@ -59,29 +59,55 @@ export default class TmpyClient extends Component {
         ];
         break;
       }
+      case 'tmpy-file-load-start': {
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.progress.type = 'load';
+        }
+        break;
+      }
+      case 'tmpy-file-load-progress': {
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.progress.fromEvent(a.data);
+          tmpyFile.progress.currentFile = a.data.currentFile;
+        }
+        break;
+      }
+      case 'tmpy-file-load-complete': {
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.progress.type = 'queue';
+        }
+        break;
+      }
       case 'tmpy-file-zip-start': {
-        // Nothing to do here
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
+
+        if (tmpyFile !== undefined) {
+          tmpyFile.progress.type = 'zip';
+        }
         break;
       }
       case 'tmpy-file-zip-progress': {
-        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
-          tmpyFile.id === a.data.tmpyFileId
-        );
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
 
         if (tmpyFile !== undefined) {
-          tmpyFile.progress.zipProgress = Math.round(a.data.percent);
-          tmpyFile.progress.zipCurrentFile = a.data.currentFile;
+          tmpyFile.progress.percent = Math.round(a.data.percent);
+          tmpyFile.progress.currentFile = a.data.currentFile;
         }
         break;
       }
       case 'tmpy-file-zip-complete': {
-        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
-          tmpyFile.id === a.data.tmpyFileId
-        );
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
 
         if (tmpyFile !== undefined) {
           tmpyFile.file = new File([ a.data.buffer ], 'tmpy-archive.zip');
-          tmpyFile.progress.zipComplete = true;
+          tmpyFile.progress.currentFile = null;
+
           this.dispatch({
             type: 'tmpy-file-upload-start',
             data: { tmpyFileIds: [ a.data.tmpyFileId ] }
@@ -90,27 +116,22 @@ export default class TmpyClient extends Component {
         break;
       }
       case 'tmpy-file-upload-start': {
-        this.uploadFiles(
-          this.tmpyFiles
-            .filter(f => a.data.tmpyFileIds.indexOf(f.id) > -1)
-        );
+        let files = this.tmpyFiles
+          .filter(f => a.data.tmpyFileIds.indexOf(f.id) > -1)
+        files.forEach(f => f.progress.type = 'upload')
+        this.uploadFiles(files);
         break;
       }
       case 'tmpy-file-upload-progress': {
-        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
-          tmpyFile.id === a.data.tmpyFileId
-        );
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
 
         if (tmpyFile !== undefined) {
-          tmpyFile.progress.uploadLoaded = a.data.loaded;
-          tmpyFile.progress.uploadTotal = a.data.total;
+          tmpyFile.progress.fromEvent(a.data)
         }
         break;
       }
       case 'tmpy-file-upload-complete': {
-        let tmpyFile = this.tmpyFiles.find(tmpyFile =>
-          tmpyFile.id === a.data.tmpyFileId
-        );
+        let tmpyFile = this.findTmpyFile(a.data.tmpyFileId);
 
         if (tmpyFile !== undefined) {
           tmpyFile.url = a.data.url;
@@ -119,6 +140,10 @@ export default class TmpyClient extends Component {
         break;
       }
     }
+  }
+
+  private findTmpyFile(id: number): TmpyFile | void {
+    return this.tmpyFiles.find(tmpyFile => tmpyFile.id === id);
   }
 
   private uploadFiles(tmpyFiles: TmpyFile[]): void {
@@ -132,7 +157,7 @@ export default class TmpyClient extends Component {
       throw new Error('File not found!');
     }
 
-    tmpyFile.progress.uploadStarted = true;
+    tmpyFile.progress.type = 'upload';
 
     new Upload(tmpyFile.file, {
       chunking: false,

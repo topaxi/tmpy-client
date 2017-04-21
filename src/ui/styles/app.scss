@@ -196,15 +196,6 @@ ul.file-list {
   background-color: #eee;
   text-align: center;
 }
-.tmpy-progress.indeterminate::before {
-  background-color: #dd9;
-}
-.tmpy-progress.zipping::before {
-  background-color: #ee0;
-}
-.tmpy-progress.completed::before {
-  background-color: #4e4;
-}
 .tmpy-progress::before {
   transition: background-color 100ms, width 50ms;
   z-index: 0;
@@ -216,6 +207,31 @@ ul.file-list {
   left: 0;
   bottom: 0;
 }
+.tmpy-progress.indeterminate::before {
+  background-color: #dd9;
+}
+.tmpy-progress-load::before {
+  background-color: #ea0;
+}
+.tmpy-progress-zip::before {
+  background-color: #ee0;
+}
+.tmpy-progress.completed::before {
+  background-color: #4e4;
+}
 .tmpy-progress > * {
   position: relative;
+}
+
+.tmpy-file-load::before {
+  content: '🔍';
+}
+
+.tmpy-file-zip::before {
+  content: '🗜️'; // compress
+  content: '📦'; // pack
+}
+
+.tmpy-file-upload::before {
+  content: '⏫';
 }

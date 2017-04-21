@@ -75,16 +75,32 @@ export default class FileUpload extends Component {
 
   upload(files: FileList): void {
     if (this.args.zip) {
-      let filesToZip = Array.from(files, file =>
-        blobToArrayBuffer(file)
-          .then(buffer => ({ name: file.name, buffer }))
-      )
-
       let tmpyFile = new TmpyFile;
+
       this.args.dispatchTmpyAction({
         type: 'tmpy-file-upload-queue',
         data: { tmpyFiles: [ tmpyFile ] }
       });
+
+      this.args.dispatchTmpyAction({
+        type: 'tmpy-file-load-start',
+        data: { tmpyFileId: tmpyFile.id }
+      });
+
+      let filesToZip = Array.from(files, file =>
+        blobToArrayBuffer(file, e => {
+          this.args.dispatchTmpyAction({
+            type: 'tmpy-file-load-progress',
+            data: {
+              tmpyFileId: tmpyFile.id,
+              currentFile: file.name,
+              total: e.total,
+              loaded: e.loaded
+            }
+          });
+        })
+          .then(buffer => ({ name: file.name, buffer }))
+      )
 
       Promise.all(filesToZip)
         .then(filesToZip => {

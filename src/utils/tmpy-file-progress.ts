@@ -1,25 +1,29 @@
 import { tracked } from '@glimmer/component';
 
+export type TmpyFileProgressType =
+  'queue' |
+  'load' |
+  'zip' |
+  'upload' |
+  'complete';
+
 export default class TmpyFileProgress {
-  @tracked zipProgress: number = 0;
-  @tracked zipComplete: boolean = false;
-  @tracked zipCurrentFile: string | null = null;
-  @tracked uploadStarted: boolean = false;
-  @tracked uploadLoaded: number = 0;
-  @tracked uploadTotal: number = 0;
+  @tracked percent: number = 0;
+  @tracked currentFile: string | null = null;
 
-  @tracked(
-    'zipComplet',
-    'zipProgress',
-    'uploadStarted',
-    'uploadLoaded',
-    'uploadTotal'
-  )
-  get percent(): number {
-    if (this.zipComplete || this.uploadStarted) {
-      return Math.round(100 / this.uploadTotal * this.uploadLoaded) || 0;
-    }
+  @tracked('_type')
+  set type(t: TmpyFileProgressType) {
+    this._type = t;
+    this.percent = 0;
+  }
+  get type(): TmpyFileProgressType {
+    return this._type;
+  }
 
-    return this.zipProgress;
+  @tracked
+  private _type: TmpyFileProgressType = 'queue';
+
+  fromEvent(e: { loaded: number, total: number }) {
+    this.percent = Math.round(100 / e.total * e.loaded || 0);
   }
 }

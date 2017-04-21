@@ -1,16 +1,16 @@
 <ul class="file-list">
   {{#each @tmpyFiles key="@index" as |tmpyFile|}}
-    <li>
+    <li class="tmpy-file tmpy-file-{{tmpyFile.progress.type}}">
       {{#if tmpyFile.completed}}
         <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
         <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
       {{else}}
-        <tmpy-progress class={{if tmpyFile.progress.uploadStarted 'uploading' 'zipping'}}
+        <tmpy-progress class="tmpy-progress-{{tmpyFile.progress.type}}"
             @percent={{tmpyFile.progress.percent}}>
           {{#if tmpyFile.file.name}}
             {{tmpyFile.file.name}}
           {{else}}
-            {{tmpyFile.progress.zipCurrentFile}}
+            {{tmpyFile.progress.currentFile}}
           {{/if}}
           {{tmpyFile.progress.percent}}%
         </tmpy-progress>

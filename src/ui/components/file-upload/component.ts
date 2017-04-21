@@ -76,7 +76,7 @@ export default class FileUpload extends Component {
   }
 
   upload(files: FileList): void {
-    if (this.args.zip) {
+    if (files.length > 1 && this.args.zip) {
       let tmpyFile = new TmpyFile;
 
       this.args.dispatchTmpyAction({

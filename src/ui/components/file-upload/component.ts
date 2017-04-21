@@ -3,6 +3,8 @@ import { TMPY_CLIENT_ACTIONS } from '../../../utils/tmpy-client-actions';
 import TmpyFile from '../../../utils/tmpy-file';
 import blobToArrayBuffer from '../../../utils/blob-to-arraybuffer';
 
+type NamedBuffer = { name: string, buffer: ArrayBuffer };
+
 export interface FileUploadArgs {
   dispatchTmpyAction: (e: TMPY_CLIENT_ACTIONS) => void;
   zip: boolean;
@@ -87,22 +89,29 @@ export default class FileUpload extends Component {
         data: { tmpyFileId: tmpyFile.id }
       });
 
-      let filesToZip = Array.from(files, file =>
-        blobToArrayBuffer(file, e => {
-          this.args.dispatchTmpyAction({
-            type: 'tmpy-file-load-progress',
-            data: {
-              tmpyFileId: tmpyFile.id,
-              currentFile: file.name,
-              total: e.total,
-              loaded: e.loaded
-            }
-          });
-        })
-          .then(buffer => ({ name: file.name, buffer }))
-      )
+      let filesToZip: Promise<NamedBuffer>[] = [];
 
-      Promise.all(filesToZip)
+      let readFilesToZip = Array.from(files, file => () => {
+        let buffer: Promise<NamedBuffer> =
+          blobToArrayBuffer(file, e =>
+            this.args.dispatchTmpyAction({
+              type: 'tmpy-file-load-progress',
+              data: {
+                tmpyFileId: tmpyFile.id,
+                currentFile: file.name,
+                total: e.total,
+                loaded: e.loaded
+              }
+            })
+          )
+          .then(buffer => ({ name: file.name, buffer }));
+        filesToZip.push(buffer);
+        return buffer;
+      })
+
+      readFilesToZip
+        .reduce((p: Promise<any>, f) => p.then(f), Promise.resolve())
+        .then(() => Promise.all(filesToZip))
         .then(filesToZip => {
           this.args.dispatchTmpyAction({
             type: 'tmpy-file-zip-start',

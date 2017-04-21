@@ -21,9 +21,14 @@ interface ZipProgress {
   currentFile: string | null;
   percent: number;
 }
+interface ZipError {
+  type: 'ziperror';
+  tmpyFileId: number;
+  error: Error;
+}
 
 interface ZipWorkerMessageEvent extends MessageEvent {
-  data: ZipBuffer | ZipProgress
+  data: ZipBuffer | ZipProgress | ZipError
 }
 
 const MAX_CONCURRENCY = 4;
@@ -160,6 +165,9 @@ export default class FileUpload extends Component {
             currentFile: e.data.currentFile
           }
         });
+      }
+      else if (e.data.type === 'ziperror') {
+        console.error(e.data.error);
       }
     }
   }

@@ -27,5 +27,12 @@ self.onmessage = function(e/*: MessageEvent*/) {
         tmpyFileId: e.data.tmpyFileId,
         buffer: buffer
       }, [ buffer ]);
+    })
+    .catch(function(error) {
+      self.postMessage({
+        type: 'ziperror',
+        tmpyFileId: e.data.tmpyFileId,
+        error: error
+      });
     });
 }

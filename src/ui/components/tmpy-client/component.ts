@@ -38,16 +38,11 @@ export default class TmpyClient extends Component {
   }
 
   didInsertElement() {
-    this.janitor = setInterval(() => {
-      let now = Date.now()
-
-      this.tmpyFiles = this.tmpyFiles
-        .filter(tf => !tf.completed || now - tf.completed_at! < MAX_AGE)
-    }, JANITOR_INTERVAL)
+    this.startJanitor()
   }
 
   willDestroy() {
-    clearInterval(this.janitor)
+    this.stopJanitor()
   }
 
   dispatch(a: TMPY_CLIENT_ACTIONS): void {
@@ -140,6 +135,21 @@ export default class TmpyClient extends Component {
         break;
       }
     }
+  }
+
+  private stopJanitor() {
+    clearInterval(this.janitor)
+  }
+
+  private startJanitor() {
+    this.stopJanitor()
+
+    this.janitor = setInterval(() => {
+      let now = Date.now()
+
+      this.tmpyFiles = this.tmpyFiles
+        .filter(tf => !tf.completed || now - tf.completed_at! < MAX_AGE)
+    }, JANITOR_INTERVAL)
   }
 
   private findTmpyFile(id: number): TmpyFile | void {

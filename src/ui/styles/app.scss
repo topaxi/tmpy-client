@@ -116,6 +116,7 @@ a {
 #drop {
   flex: 1;
   display: flex;
+  contain: strict;
   min-height: 128px;
   justify-content: center;
   align-items: center;
@@ -149,13 +150,13 @@ a {
   border-radius: 2px;
   color: #444;
 }
-span.drop-hint {
-  -webkit-transition: all .2s ease;
+.drop-hint {
   transition: all .2s ease;
 }
 
 ul.file-list {
-  list-style-type: square;
+  list-style: none;
+  padding-left: 0;
 }
 
 @keyframes new-file-fadein {
@@ -180,7 +181,7 @@ ul.file-list {
 }
 
 .file-list > li {
-  padding: .2rem .5rem;
+  margin: .2rem 0;
   animation: new-file-background 1s, new-file-fadein 0.2s;
 }
 
@@ -191,7 +192,6 @@ ul.file-list {
 .tmpy-progress {
   display: inline-block;
   min-width: 200px;
-  max-height: 1rem;
   position: relative;
   background-color: #eee;
   text-align: center;
@@ -223,6 +223,19 @@ ul.file-list {
   position: relative;
 }
 
+.tmpy-file {
+  display: flex;
+  align-items: center;
+}
+
+.tmpy-file::before {
+  margin-right: 0.2rem;
+}
+
+.tmpy-file-queue::before {
+  content: '⌛';
+}
+
 .tmpy-file-load::before {
   content: '🔍';
 }
@@ -234,4 +247,15 @@ ul.file-list {
 
 .tmpy-file-upload::before {
   content: '⏫';
+}
+
+.tmpy-file-complete::before {
+  content: '▪';
+}
+
+.tmpy-progress {
+  max-width: 100%;
+  min-width: 50%;
+  text-align: left;
+  padding: .1rem .2rem;
 }

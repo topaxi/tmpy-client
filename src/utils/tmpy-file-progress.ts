@@ -24,6 +24,6 @@ export default class TmpyFileProgress {
   private _type: TmpyFileProgressType = 'queue';
 
   fromEvent(e: { loaded: number, total: number }) {
-    this.percent = Math.round(100 / e.total * e.loaded || 0);
+    this.percent = 100 / e.total * e.loaded || 0;
   }
 }

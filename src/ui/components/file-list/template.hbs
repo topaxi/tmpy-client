@@ -1,20 +1,22 @@
 <ul class="file-list">
   {{#each @tmpyFiles key="@index" as |tmpyFile|}}
-    <li class="tmpy-file tmpy-file-{{tmpyFile.progress.type}}">
-      {{#if tmpyFile.completed}}
-        <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
-        <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
-      {{else}}
-        <tmpy-progress class="tmpy-progress-{{tmpyFile.progress.type}}"
-            @percent={{tmpyFile.progress.percent}}>
-          {{#if tmpyFile.file.name}}
-            {{tmpyFile.file.name}}
-          {{else}}
-            {{tmpyFile.progress.currentFile}}
-          {{/if}}
-          {{tmpyFile.progress.percent}}%
-        </tmpy-progress>
-      {{/if}}
+    <li>
+      <div class="tmpy-file tmpy-file-{{tmpyFile.progress.type}}">
+        {{#if tmpyFile.completed}}
+          <a href={{tmpyFile.url}}>{{tmpyFile.file.name}}</a>
+          <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
+        {{else}}
+          <tmpy-progress class="tmpy-progress-{{tmpyFile.progress.type}}"
+              @percent={{tmpyFile.progress.percent}}>
+            {{#if tmpyFile.file.name}}
+              {{tmpyFile.file.name}}
+            {{else}}
+              {{tmpyFile.progress.currentFile}}
+            {{/if}}
+            {{precision tmpyFile.progress.percent 0}}%
+          </tmpy-progress>
+        {{/if}}
+      </div>
     </li>
   {{/each}}
 </ul>

@@ -1,37 +1,51 @@
+'use strict';
+
 self.importScripts('/assets/jszip.min.js');
+
+var ONE_FRAME = 1000 / 60;
+var ZIP_OPTIONS = {
+  type: 'arraybuffer'
+};
 
 self.onmessage = function(e/*: MessageEvent*/) {
   var zip = new JSZip;
-  var lastPercent = 0;
+  var time = performance.now();
+  var tmpyFileId = e.data.tmpyFileId;
 
   for (var i = 0; i < e.data.filesToZip.length; i++) {
-    zip.file(e.data.filesToZip[i].name, e.data.filesToZip[i].buffer)
+    zip.file(e.data.filesToZip[i].name, e.data.filesToZip[i].buffer);
   }
 
-  zip.generateAsync({ type: 'arraybuffer' }, ({ currentFile, percent }) => {
-    var flooredPercent = Math.floor(percent);
+  zip.generateAsync(ZIP_OPTIONS, function onZipUpdate(meta) {
+    var now = performance.now();
 
-    if (lastPercent !== flooredPercent) {
+    if ((time + ONE_FRAME - now) <= 0) {
       self.postMessage({
         type: 'zipprogress',
-        tmpyFileId: e.data.tmpyFileId,
-        currentFile: currentFile,
-        percent: percent
+        tmpyFileId: tmpyFileId,
+        currentFile: meta.currentFile,
+        percent: meta.percent
       });
+      time = now;
     }
-    lastPercent = flooredPercent;
   })
-    .then(function(buffer) {
+    .then(function onZipComplete(buffer) {
+      self.postMessage({
+        type: 'zipprogress',
+        tmpyFileId: tmpyFileId,
+        currentFile: null,
+        percent: 100
+      });
       self.postMessage({
         type: 'zipbuffer',
-        tmpyFileId: e.data.tmpyFileId,
+        tmpyFileId: tmpyFileId,
         buffer: buffer
       }, [ buffer ]);
     })
-    .catch(function(error) {
+    .catch(function onZipError(error) {
       self.postMessage({
         type: 'ziperror',
-        tmpyFileId: e.data.tmpyFileId,
+        tmpyFileId: tmpyFileId,
         error: error
       });
     });

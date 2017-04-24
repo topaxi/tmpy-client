@@ -7,7 +7,7 @@ const MAX_AGE = 15 * 60 * 1000;
 const JANITOR_INTERVAL = 5 * 1000;
 
 export default class TmpyClient extends Component {
-  @tracked tmpyFiles: TmpyFile[] = [];
+  @tracked tmpyFiles: TmpyFile[];
   @tracked showScript: boolean = false;
   @tracked script: string;
 
@@ -21,6 +21,12 @@ export default class TmpyClient extends Component {
 
   private janitor: number;
   private _script: Promise<string>;
+
+  constructor(options: object) {
+    super(options);
+    this.tmpyFiles = JSON.parse(localStorage.getItem('tmpyFiles') || '[]');
+    this.runJanitor();
+  }
 
   setEnableZip(e: Event): void {
     this.enableZip = (e.target as HTMLInputElement).checked;
@@ -138,6 +144,7 @@ export default class TmpyClient extends Component {
         if (tmpyFile !== undefined) {
           tmpyFile.url = a.data.url;
           tmpyFile.completed = true;
+          this.storeFiles();
         }
         break;
       }
@@ -151,15 +158,30 @@ export default class TmpyClient extends Component {
   private startJanitor() {
     this.stopJanitor()
 
-    this.janitor = setInterval(() => {
-      let now = Date.now()
-
-      this.tmpyFiles = this.tmpyFiles
-        .filter(tf => !tf.completed || now - tf.completed_at! < MAX_AGE)
-    }, JANITOR_INTERVAL)
+    this.janitor = setInterval(() => this.runJanitor(), JANITOR_INTERVAL)
   }
 
-  private findTmpyFile(id: number): TmpyFile | void {
+  private runJanitor() {
+    let now = Date.now()
+    let len = this.tmpyFiles.length
+
+    this.tmpyFiles = this.tmpyFiles
+      .filter(tf => !tf.completed || now - tf.completed_at! < MAX_AGE)
+
+    if (len !== this.tmpyFiles.length) {
+      this.storeFiles()
+    }
+  }
+
+  private storeFiles() {
+    localStorage.setItem('tmpyFiles',
+      JSON.stringify(
+        this.tmpyFiles
+          .filter(tf => tf.completed)
+          .map(TmpyFile.toJSON)));
+  }
+
+  private findTmpyFile(id: string): TmpyFile | void {
     return this.tmpyFiles.find(tmpyFile => tmpyFile.id === id);
   }
 

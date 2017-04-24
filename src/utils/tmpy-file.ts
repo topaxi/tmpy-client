@@ -1,11 +1,22 @@
 import { tracked } from '@glimmer/component';
 import TmpyFileProgress from './tmpy-file-progress';
-import blobToArrayBuffer from '../utils/blob-to-arraybuffer';
-
-let fileId = 0;
+import blobToArrayBuffer from './blob-to-arraybuffer';
+import uniqid from './uniqid';
 
 export default class TmpyFile {
-  readonly id: number = ++fileId;
+  static toJSON(tmpyFile: TmpyFile) {
+    return {
+      id: tmpyFile.id,
+      name: tmpyFile.name,
+      size: tmpyFile.size,
+      url: tmpyFile.url,
+      progress: { type: tmpyFile.progress.type },
+      completed: tmpyFile.completed,
+      completed_at: tmpyFile.completed_at
+    }
+  }
+
+  readonly id: string = uniqid();
   readonly progress: TmpyFileProgress = new TmpyFileProgress;
 
   @tracked name: string = '';
@@ -40,5 +51,9 @@ export default class TmpyFile {
 
   constructor(file: File | null = null) {
     this.file = file;
+  }
+
+  toJSON() {
+    return TmpyFile.toJSON(this);
   }
 }

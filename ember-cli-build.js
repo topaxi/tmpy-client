@@ -8,7 +8,7 @@ const mergeTrees = require('broccoli-merge-trees');
 
 module.exports = function(defaults) {
   let app = new GlimmerApp(defaults, {
-    // sourcemaps: { enabled: false },
+    sourcemaps: { enabled: false },
     rollup: {
       plugins: [
         resolve({ jsnext: true, module: true, main: true }),

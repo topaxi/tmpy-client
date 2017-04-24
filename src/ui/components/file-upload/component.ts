@@ -12,18 +12,18 @@ export interface FileUploadArgs {
 
 interface ZipBuffer {
   type: 'zipbuffer';
-  tmpyFileId: number;
+  tmpyFileId: string;
   buffer: ArrayBuffer;
 }
 interface ZipProgress {
   type: 'zipprogress';
-  tmpyFileId: number;
+  tmpyFileId: string;
   currentFile: string | null;
   percent: number;
 }
 interface ZipError {
   type: 'ziperror';
-  tmpyFileId: number;
+  tmpyFileId: string;
   error: Error;
 }
 

@@ -1,5 +1,5 @@
 <ul class="file-list">
-  {{#each @tmpyFiles key="@index" as |tmpyFile|}}
+  {{#each @tmpyFiles key="id" as |tmpyFile|}}
     <li>
       <div class="tmpy-file tmpy-file-{{tmpyFile.progress.type}}">
         {{#if tmpyFile.completed}}

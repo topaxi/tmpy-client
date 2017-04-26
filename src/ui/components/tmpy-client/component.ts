@@ -46,6 +46,24 @@ export default class TmpyClient extends Component {
     });
   }
 
+  deleteFile(tmpyFile: TmpyFile): Promise<Response> {
+    if (!tmpyFile.url) {
+      return Promise.reject(new Error('Unable to delete file without url'));
+    }
+
+    return fetch(tmpyFile.url, { method: 'delete' })
+      .then(res => {
+        if (res.ok) {
+          this.dispatch({
+            type: 'tmpy-file-remove',
+            data: [ tmpyFile ]
+          });
+        }
+
+        return res;
+      });
+  }
+
   stopPropagation(e: MouseEvent) {
     e.stopPropagation();
   }
@@ -148,6 +166,16 @@ export default class TmpyClient extends Component {
         }
         break;
       }
+      case 'tmpy-file-remove': {
+        let oldTmpyFilesLength = this.tmpyFiles.length;
+        this.tmpyFiles = this.tmpyFiles.filter(tf =>
+          a.data.indexOf(tf) === -1
+        );
+        if (this.tmpyFiles.length !== oldTmpyFilesLength) {
+          this.storeFiles();
+        }
+        break;
+      }
     }
   }
 
@@ -163,14 +191,14 @@ export default class TmpyClient extends Component {
 
   private runJanitor() {
     let now = Date.now()
-    let len = this.tmpyFiles.length
+    let filesToRemove = this.tmpyFiles.filter(tf =>
+      tf.completed && now - tf.completed_at! >= MAX_AGE
+    )
 
-    this.tmpyFiles = this.tmpyFiles
-      .filter(tf => !tf.completed || now - tf.completed_at! < MAX_AGE)
-
-    if (len !== this.tmpyFiles.length) {
-      this.storeFiles()
-    }
+    this.dispatch({
+      type: 'tmpy-file-remove',
+      data: filesToRemove
+    });
   }
 
   private storeFiles() {

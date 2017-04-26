@@ -24,7 +24,7 @@ declare namespace Clipboard {
   }
 }
 
-const TOOLTIP_TIMEOUT = 1000;
+const TOOLTIP_TIMEOUT = 2000;
 
 export default class TmpyClipboard extends Component {
   args: { content: string };
@@ -42,20 +42,21 @@ export default class TmpyClipboard extends Component {
     })
 
     this.clipboard.on('success', () => {
-      this.tooltip = 'Copied!';
-
-      setTimeout(() => this.tooltip = null, TOOLTIP_TIMEOUT);
+      this.showTooltip('Copied!')
     })
 
     this.clipboard.on('error', e => {
-      this.tooltip = this.fallbackMessage(e.action);
-
-      setTimeout(() => this.tooltip = null, TOOLTIP_TIMEOUT);
+      this.showTooltip(this.fallbackMessage(e.action))
     })
   }
 
   willDestroy() {
     this.clipboard.destroy()
+  }
+
+  private showTooltip(msg: string): void {
+    this.tooltip = msg
+    setTimeout(() => this.tooltip = null, TOOLTIP_TIMEOUT)
   }
 
   private fallbackMessage(action: string): string {

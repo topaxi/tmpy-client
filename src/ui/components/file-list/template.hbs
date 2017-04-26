@@ -7,7 +7,8 @@
             {{~tmpyFile.name}}
             {{#if tmpyFile.size}}- {{file-size tmpyFile.size}}{{/if~}}
           </a>
-          <tmpy-clipboard @content={{tmpyFile.url}}></tmpy-clipboard>
+          <tmpy-clipboard class="copy" @content={{tmpyFile.url}}>📋</tmpy-clipboard>
+          <button class="delete" onclick={{action @onDelete tmpyFile}}>❌</button>
         {{else}}
           <tmpy-progress class="tmpy-progress-{{tmpyFile.progress.type}}"
               @percent={{tmpyFile.progress.percent}}>

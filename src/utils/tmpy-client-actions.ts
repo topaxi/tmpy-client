@@ -75,6 +75,11 @@ export interface TmpyFileUploadCompleteAction {
   };
 }
 
+export interface TmpyFileRemoveAction {
+  readonly type: 'tmpy-file-remove';
+  readonly data: TmpyFile[];
+}
+
 export type TMPY_CLIENT_ACTIONS =
   TmpyFileUploadQueueAction |
   TmpyFileLoadProgressAction |
@@ -85,4 +90,5 @@ export type TMPY_CLIENT_ACTIONS =
   TmpyFileZipCompleteAction |
   TmpyFileUploadStartAction |
   TmpyFileUploadProgressAction |
-  TmpyFileUploadCompleteAction;
+  TmpyFileUploadCompleteAction |
+  TmpyFileRemoveAction;

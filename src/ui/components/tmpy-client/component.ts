@@ -7,7 +7,7 @@ const MAX_AGE = 15 * 60 * 1000;
 const JANITOR_INTERVAL = 5 * 1000;
 
 export default class TmpyClient extends Component {
-  @tracked tmpyFiles: TmpyFile[];
+  @tracked tmpyFiles: ReadonlyArray<TmpyFile>;
   @tracked showScript: boolean = false;
   @tracked script: string;
 
@@ -213,7 +213,7 @@ export default class TmpyClient extends Component {
     return this.tmpyFiles.find(tmpyFile => tmpyFile.id === id);
   }
 
-  private uploadFiles(tmpyFiles: TmpyFile[]): void {
+  private uploadFiles(tmpyFiles: ReadonlyArray<TmpyFile>): void {
     tmpyFiles.forEach(tmpyFile =>
       this.uploadFile(tmpyFile)
     );

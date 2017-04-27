@@ -47,14 +47,14 @@ export interface TmpyFileZipCompleteAction {
 export interface TmpyFileUploadQueueAction {
   readonly type: 'tmpy-file-upload-queue';
   readonly data: {
-    readonly tmpyFiles: TmpyFile[]
+    readonly tmpyFiles: ReadonlyArray<TmpyFile>
   };
 }
 
 export interface TmpyFileUploadStartAction {
   readonly type: 'tmpy-file-upload-start';
   readonly data: {
-    readonly tmpyFileIds: string[]
+    readonly tmpyFileIds: ReadonlyArray<string>
   };
 }
 
@@ -77,7 +77,7 @@ export interface TmpyFileUploadCompleteAction {
 
 export interface TmpyFileRemoveAction {
   readonly type: 'tmpy-file-remove';
-  readonly data: TmpyFile[];
+  readonly data: ReadonlyArray<TmpyFile>;
 }
 
 export type TMPY_CLIENT_ACTIONS =

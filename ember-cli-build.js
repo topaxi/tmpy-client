@@ -5,6 +5,8 @@ const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
 const Funnel = require('broccoli-funnel');
 const mergeTrees = require('broccoli-merge-trees');
+const cssnano = require('cssnano');
+const autoprefixer = require('autoprefixer');
 
 module.exports = function(defaults) {
   let app = new GlimmerApp(defaults, {
@@ -14,6 +16,26 @@ module.exports = function(defaults) {
         resolve({ jsnext: true, module: true, main: true }),
         commonjs()
       ]
+    },
+    postcssOptions: {
+      compile: {
+        enabled: false
+      },
+      filter: {
+        enabled: true,
+        map: { inline: false },
+        plugins: [
+          {
+            module: autoprefixer,
+            options: {
+              browsers: [ 'last 3 versions', 'Firefox ESR' ]
+            }
+          },
+          {
+            module: cssnano
+          }
+        ]
+      }
     }
   });
 

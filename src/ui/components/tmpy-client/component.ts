@@ -209,7 +209,7 @@ export default class TmpyClient extends Component {
           .map(TmpyFile.toJSON)));
   }
 
-  private findTmpyFile(id: string): TmpyFile | void {
+  private findTmpyFile(id: string): TmpyFile | undefined {
     return this.tmpyFiles.find(tmpyFile => tmpyFile.id === id);
   }
 

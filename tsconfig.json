@@ -6,8 +6,10 @@
     "inlineSources": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true
+    "strict": true,
+    "types": [
+      "qunit"
+    ]
   },
   "exclude": [
     "node_modules",

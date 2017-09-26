@@ -70,6 +70,8 @@ export interface UploadOptions {
   done?(res: any): void;
 }
 
+type EventCallback = (this: Upload, ...args: any[]) => void;
+
 export default class Upload {
   static upload          = upload
   static target          = '/upload'
@@ -86,7 +88,7 @@ export default class Upload {
   private target: string;
   private accept: string;
   private method: string;
-  private events = dict<Function[]>();
+  private events = dict<EventCallback[]>();
   private xhr: XMLHttpRequest | null = null; // the current XMLHttpRequest
   private chunking: boolean;
   private chunks: number;
@@ -162,8 +164,8 @@ export default class Upload {
     let chunk  = this.chunking ? sliceFile(this.file, this.chunkNumber, this.chunkSize) : this.file
 
     if (this.chunking) {
-      form.append('first', +(this.chunkNumber == 0))
-      form.append('last',  +(this.chunkNumber == this.chunks - 1))
+      form.append('first', this.chunkNumber == 0 ? '1' : '0')
+      form.append('last',  this.chunkNumber == this.chunks - 1 ? '1' : '0')
     }
 
     if (this.data) {
@@ -225,7 +227,7 @@ export default class Upload {
 
     return this
   }
-  on(e: string, handler: Function) {
+  on(e: string, handler: EventCallback) {
     if (!Array.isArray(this.events[e])) {
       this.events[e] = [ handler ]
 
@@ -236,7 +238,7 @@ export default class Upload {
 
     return this
   }
-  off(e: string, handler: Function) {
+  off(e: string, handler: EventCallback) {
     if (!Array.isArray(this.events[e])) return this
 
     if (!handler) {
@@ -251,7 +253,7 @@ export default class Upload {
 
     return this
   }
-  once(e: string, handler: Function) {
+  once(e: string, handler: EventCallback) {
     this.on(e, function() {
       handler.apply(this, arguments)
 
@@ -275,7 +277,7 @@ function fileDone() {
   }
 }
 
-function ready(fun: Function, self: Upload) {
+function ready(fun: Function, self: Upload): (this: XMLHttpRequest) => void {
   return function() {
     if (this.readyState == 3) fun.apply(self, arguments)
   }

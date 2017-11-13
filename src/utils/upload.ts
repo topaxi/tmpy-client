@@ -16,6 +16,15 @@ export function upload(files: File | File[], config?: any): Upload | Upload[] {
   }
 }
 
+class ChunkMeta {
+  constructor(
+    public loaded: number,
+    public total: number,
+    public number: number,
+    public percent: number
+  ) {}
+}
+
 export class UploadProgressEvent {
   public originalEvent: ProgressEvent;
   public lengthComputable: boolean;
@@ -27,12 +36,7 @@ export class UploadProgressEvent {
   public file: File;
   public total: number;
   public totalSize: number;
-  public chunk: {
-    loaded: number,
-    total: number,
-    number: number,
-    percent: number
-  };
+  public chunk: ChunkMeta;
   public percent: number;
 
   constructor(e: ProgressEvent, up: Upload) {
@@ -46,11 +50,12 @@ export class UploadProgressEvent {
     this.file             = up.file
     this.total            = up.file.size
     this.totalSize        = e.total
-    this.chunk            = { loaded:  up.chunkLoaded
-                            , total:   up.chunkTotal
-                            , number:  up.chunkNumber
-                            , percent: 100 / up.chunkTotal * up.chunkLoaded
-                            }
+    this.chunk            = new ChunkMeta(
+                              up.chunkLoaded,
+                              up.chunkTotal,
+                              up.chunkNumber,
+                              100 / up.chunkTotal * up.chunkLoaded
+                            )
     this.percent          = 100 / this.total * this.loaded
   }
 }
@@ -62,7 +67,7 @@ export interface UploadOptions {
   accept?: string;
   method?: string;
   chunking?: boolean;
-  data?: any;
+  data?: { [key: string]: any };
   prependQueue?: boolean;
   processResponse?: (xhr: XMLHttpRequest) => any;
   start?(): void;
@@ -92,7 +97,7 @@ export default class Upload {
   private xhr: XMLHttpRequest | null = null; // the current XMLHttpRequest
   private chunking: boolean;
   private chunks: number;
-  private data: any;
+  private data: { [key: string]: any } | null;
   private prependQueue: boolean;
   private processResponse: (xhr: XMLHttpRequest) => any;
 
@@ -125,7 +130,7 @@ export default class Upload {
     if (config.done)     this.once('done',     config.done    )
   }
 
-  then(success: any, error?: any) {
+  then(success: any, error?: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.once('done', resolve)
       this.once('error', reject)
@@ -145,7 +150,7 @@ export default class Upload {
     uploadCount++
 
     this.onbeforesend(() => {
-      this.chunks      = this.chunking ? this.countChunks() : 1
+      this.chunks      = this.chunking === true ? this.countChunks() : 1
       this.chunkNumber = 0
       this._sendChunk()
 
@@ -154,21 +159,23 @@ export default class Upload {
 
     return this
   }
-  countChunks() {
-    return this.chunks = Math.round(this.file.size / this.chunkSize + .5)
+  countChunks(): number {
+    return this.chunks = Math.ceil(this.file.size / this.chunkSize)
   }
-  private _sendChunk() {
+  private _sendChunk(): void {
     let form   = new FormData
     let xhr    = this.xhr = new XMLHttpRequest
-    let upload = xhr.upload || xhr
-    let chunk  = this.chunking ? sliceFile(this.file, this.chunkNumber, this.chunkSize) : this.file
+    let upload = xhr.upload === undefined ? xhr : xhr.upload
+    let chunk  = this.chunking === true
+      ? sliceFile(this.file, this.chunkNumber, this.chunkSize)
+      : this.file
 
-    if (this.chunking) {
+    if (this.chunking === true) {
       form.append('first', this.chunkNumber == 0 ? '1' : '0')
       form.append('last',  this.chunkNumber == this.chunks - 1 ? '1' : '0')
     }
 
-    if (this.data) {
+    if (this.data !== null) {
       for (let i in this.data) {
         form.append(i, this.data[i])
       }
@@ -193,7 +200,7 @@ export default class Upload {
 
     this.trigger('progress', new UploadProgressEvent(e, this))
   }
-  private _ready() {
+  private _ready(): void {
     let res = this.processResponse(this.xhr!)
 
     if (this.chunkNumber == this.chunks - 1) {
@@ -212,13 +219,13 @@ export default class Upload {
       this._sendChunk()
     }
   }
-  post() {
+  post(): Upload {
     return this.send('post')
   }
-  put() {
+  put(): Upload {
     return this.send('put')
   }
-  trigger(e: string, ...args: any[]) {
+  trigger(e: string, ...args: any[]): Upload {
     if (Array.isArray(this.events[e])) {
       this.events[e].forEach(handler =>
         handler.apply(this, args)
@@ -227,7 +234,7 @@ export default class Upload {
 
     return this
   }
-  on(e: string, handler: EventCallback) {
+  on(e: string, handler: EventCallback): Upload {
     if (!Array.isArray(this.events[e])) {
       this.events[e] = [ handler ]
 
@@ -238,7 +245,7 @@ export default class Upload {
 
     return this
   }
-  off(e: string, handler: EventCallback) {
+  off(e: string, handler: EventCallback): Upload {
     if (!Array.isArray(this.events[e])) return this
 
     if (!handler) {
@@ -253,7 +260,7 @@ export default class Upload {
 
     return this
   }
-  once(e: string, handler: EventCallback) {
+  once(e: string, handler: EventCallback): void {
     this.on(e, function() {
       handler.apply(this, arguments)
 
@@ -265,11 +272,11 @@ export default class Upload {
   }
 }
 
-function sliceFile(file: File, from: number, size: number) {
+function sliceFile(file: File, from: number, size: number): Blob {
   return file.slice(from * size, from * size + size, file.type)
 }
 
-function fileDone() {
+function fileDone(): void {
   uploadCount--
 
   if (globalQueue.length) {
@@ -283,8 +290,8 @@ function ready(fun: Function, self: Upload): (this: XMLHttpRequest) => void {
   }
 }
 
-function progress(fun: Function, self: Upload) {
-  return (e: ProgressEvent) => {
+function progress(fun: Function, self: Upload): (e: ProgressEvent) => void {
+  return e => {
     fun.call(self, e, e.loaded, e.total)
   }
 }

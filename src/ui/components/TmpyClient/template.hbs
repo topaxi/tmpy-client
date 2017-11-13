@@ -18,13 +18,13 @@
   <p>
     <small>Files are deleted automatically 15 minutes after the upload</small>
   </p>
-  <file-list @tmpyFiles={{tmpyFiles}} @onDelete={{action deleteFile}}></file-list>
+  <FileList @tmpyFiles={{tmpyFiles}} @onDelete={{action deleteFile}}></FileList>
   <label class="zip-toggle">
     <input id="enableZip" class="toggle" type="checkbox" checked={{enableZip}} onchange={{action setEnableZip}}>
     <label for="enableZip"></label>
     .zip
   </label>
-  <file-upload
+  <FileUpload
       @dispatchTmpyAction={{action dispatch}}
-      @zip={{enableZip}}></file-upload>
+      @zip={{enableZip}}></FileUpload>
 </main>
